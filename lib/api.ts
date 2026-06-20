@@ -5,6 +5,19 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Attach localStorage accessToken as Bearer token
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+
+  return config;
+});
+
 let isRefreshing = false;
 
 let failedQueue: {
@@ -68,7 +81,11 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post("/auth/refresh");
+        const refreshRes = await api.post("/auth/refresh");
+
+        if (refreshRes.data?.accessToken && typeof window !== "undefined") {
+          localStorage.setItem("accessToken", refreshRes.data.accessToken);
+        }
 
         processQueue();
 
@@ -76,8 +93,13 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError);
 
-        if (typeof window !== "undefined" && !isPublicPage()) {
-          window.location.replace("/login");
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+
+          if (!isPublicPage()) {
+            window.location.replace("/login");
+          }
         }
 
         return Promise.reject(refreshError);
