@@ -6,24 +6,58 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: [
+          "/",
+          "/startups",
+          "/startups/*",
+          "/jobs",
+          "/jobs/*",
+          "/t/*",
+          "/blog",
+          "/blog/*",
+          "/case-studies",
+          "/case-studies/*",
+          "/founder-stories",
+          "/founder-stories/*",
+        ],
         disallow: [
+          "/api/",
+          "/admin/",
+          "/login",
+          "/signup",
+          "/verify-email",
+          "/forgot-password",
+          "/reset-password/",
+
           "/onboarding",
+
           "/startup",
-          "/startup/*",
+          "/startup/",
+
+          "/talent/dashboard",
+          "/talent/profile",
           "/talent/saved-jobs",
           "/talent/applications",
           "/talent/messages",
           "/talent/notifications",
+
           "/messages",
           "/notifications",
+
           "/profile",
-          "/profile/*",
-          "/api",
-          "/api/*",
+          "/profile/",
+
+          "/_next/",
         ],
       },
+
+      {
+        userAgent: "Googlebot-Image",
+        allow: "/",
+      },
     ],
+
     sitemap: `${siteConfig.url}/sitemap.xml`,
+    host: siteConfig.url,
   };
 }

@@ -1,19 +1,34 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { siteConfig } from "@/lib/seo";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://covisioner.com";
-const apiUrl =
+export const revalidate = 3600;
+
+const BASE_URL = siteConfig.url;
+const API_URL =
   process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL 
- 
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:5001/api";
 
 async function safeFetch(path: string) {
   try {
-    const res = await fetch(`${apiUrl}${path}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}${path}`, {
+      next: { revalidate: 3600 },
+    });
+
     if (!res.ok) return [];
+
     const data = await res.json();
 
     if (Array.isArray(data)) return data;
-    return data.jobs || data.startups || data.talent || data.talents || [];
+
+    return (
+      data.jobs ||
+      data.startups ||
+      data.talent ||
+      data.talents ||
+      data.profiles ||
+      []
+    );
   } catch {
     return [];
   }
@@ -28,31 +43,47 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: baseUrl,
+      url: BASE_URL,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: `${BASE_URL}/talent/explore/startups`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/talent/explore/jobs`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
+
+    ...startups.map((startup: any) => ({
+      url: `${BASE_URL}/startups/${startup.slug || startup._id}`,
+      lastModified: startup.updatedAt ? new Date(startup.updatedAt) : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
 
     ...jobs.map((job: any) => ({
-      url: `${baseUrl}/jobs/${job.slug || job._id}`,
-      lastModified: new Date(job.updatedAt || Date.now()),
+      url: `${BASE_URL}/jobs/${job.slug || job._id}`,
+      lastModified: job.updatedAt ? new Date(job.updatedAt) : new Date(),
       changeFrequency: "daily" as const,
       priority: 0.9,
     })),
 
-    ...startups.map((startup: any) => ({
-      url: `${baseUrl}/startups/${startup.slug || startup._id}`,
-      lastModified: new Date(startup.updatedAt || Date.now()),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    })),
-
-    ...talents.map((talent: any) => ({
-      url: `${baseUrl}/t/${talent.username}`,
-      lastModified: new Date(talent.updatedAt || Date.now()),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
+    ...talents
+      .filter((talent: any) => talent.username)
+      .map((talent: any) => ({
+        url: `${BASE_URL}/t/${talent.username}`,
+        lastModified: talent.updatedAt
+          ? new Date(talent.updatedAt)
+          : new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })),
   ];
 }

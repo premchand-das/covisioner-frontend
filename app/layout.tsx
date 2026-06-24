@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { Geist } from "next/font/google";
+
 import SocketProvider from "@/components/SocketProvider";
 import AuthProvider from "@/components/AuthProvider";
-
-import "./globals.css";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/lib/seo";
+
+import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -24,9 +25,26 @@ export const metadata: Metadata = {
   keywords: siteConfig.keywords,
 
   applicationName: "CoVisioner",
-  authors: [{ name: "CoVisioner" }],
+  authors: [{ name: "CoVisioner", url: siteConfig.url }],
   creator: "CoVisioner",
   publisher: "CoVisioner",
+  category: "technology",
+
+  referrer: "origin-when-cross-origin",
+
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+
+  manifest: "/site.webmanifest",
 
   openGraph: {
     title: siteConfig.title,
@@ -50,6 +68,7 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
+    creator: "@covisioner",
   },
 
   robots: {
@@ -67,6 +86,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteConfig.url,
   },
+
+  verification: {
+    google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
+  },
 };
 
 export default function RootLayout({
@@ -75,7 +98,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en-IN" className={cn("font-sans", geist.variable)}>
       <body>
         <SocketProvider>
           <AuthProvider>{children}</AuthProvider>

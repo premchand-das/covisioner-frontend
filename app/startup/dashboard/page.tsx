@@ -295,7 +295,7 @@ function StartupDashboardContent() {
                       step="0.1"
                       value={form.equityMin}
                       onChange={handleChange}
-                      placeholder="0"
+                      placeholder="4"
                     />
 
                     <Input

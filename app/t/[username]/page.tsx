@@ -22,11 +22,25 @@ async function getTalentProfile(username: string) {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+function cleanText(value?: string, max = 155) {
+  if (!value) return "";
+
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+
+function safeJsonLd(schema: object) {
+  return JSON.stringify(schema).replace(/</g, "\\u003c");
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const profile = await getTalentProfile(username);
+
+  const canonical = `${siteConfig.url}/t/${username}`;
 
   if (!profile) {
     return {
@@ -34,17 +48,19 @@ export async function generateMetadata({
       description:
         "Explore startup talent profiles, builders, projects, skills, experience, and portfolios on CoVisioner.",
       alternates: {
-        canonical: `${siteConfig.url}/t/${username}`,
+        canonical,
       },
     };
   }
 
-  const title = `${profile.fullname || username} | Startup Talent Profile`;
+  const displayName = profile.fullname || username;
+
+  const title = `${displayName} | Startup Talent Profile`;
 
   const description =
-    profile.headline ||
-    profile.bio?.slice(0, 155) ||
-    `View ${profile.fullname || username}'s startup talent profile, skills, projects, experience, and portfolio on CoVisioner.`;
+    cleanText(profile.headline) ||
+    cleanText(profile.bio) ||
+    `View ${displayName}'s startup talent profile, skills, projects, experience, and portfolio on CoVisioner.`;
 
   const image = profile.avatar || profile.user?.avatar || siteConfig.ogImage;
 
@@ -52,22 +68,25 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: `${siteConfig.url}/t/${username}`,
+      canonical,
     },
     openGraph: {
       title,
       description,
-      url: `${siteConfig.url}/t/${username}`,
+      url: canonical,
       siteName: "CoVisioner",
       images: [
         {
           url: image,
           width: 1200,
           height: 630,
-          alt: `${profile.fullname || username} talent profile on CoVisioner`,
+          alt: `${displayName} talent profile on CoVisioner`,
         },
       ],
       type: "profile",
+      firstName: displayName.split(" ")[0],
+      lastName: displayName.split(" ").slice(1).join(" ") || undefined,
+      username,
     },
     twitter: {
       card: "summary_large_image",
@@ -82,43 +101,82 @@ export default async function TalentProfilePage({ params }: Props) {
   const { username } = await params;
   const profile = await getTalentProfile(username);
 
+  const displayName = profile?.fullname || username;
+  const canonical = `${siteConfig.url}/t/${username}`;
+
+  const sameAs = profile
+    ? [
+        profile.socialLinks?.linkedin,
+        profile.socialLinks?.twitter,
+        profile.socialLinks?.github,
+        profile.socialLinks?.website,
+      ].filter(Boolean)
+    : [];
+
   const personSchema = profile
     ? {
         "@context": "https://schema.org",
         "@type": "Person",
-        name: profile.fullname || username,
-        url: `${siteConfig.url}/t/${username}`,
+        name: displayName,
+        url: canonical,
         image: profile.avatar || profile.user?.avatar || undefined,
         jobTitle: profile.headline || "Startup Talent",
         description:
-          profile.bio ||
-          profile.headline ||
-          `${profile.fullname || username} talent profile on CoVisioner.`,
-        knowsAbout: profile.skills || undefined,
-        sameAs: [
-          profile.socialLinks?.linkedin,
-          profile.socialLinks?.twitter,
-          profile.socialLinks?.github,
-          profile.socialLinks?.website,
-        ].filter(Boolean),
+          cleanText(profile.bio, 500) ||
+          cleanText(profile.headline, 500) ||
+          `${displayName} talent profile on CoVisioner.`,
+        knowsAbout: profile.skills?.length ? profile.skills : undefined,
+        sameAs: sameAs.length ? sameAs : undefined,
         hasOccupation: {
           "@type": "Occupation",
           name: profile.headline || "Startup Talent",
-          skills: profile.skills?.join(", ") || undefined,
+          skills: profile.skills?.length
+            ? profile.skills.join(", ")
+            : undefined,
         },
       }
     : null;
 
+  const breadcrumbSchema = profile
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: siteConfig.url,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Talent Profiles",
+            item: `${siteConfig.url}/t/${username}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: displayName,
+            item: canonical,
+          },
+        ],
+      }
+    : null;
+
+  const schemas = [personSchema, breadcrumbSchema].filter(Boolean);
+
   return (
     <>
-      {personSchema && (
+      {schemas.map((schema, index) => (
         <script
+          key={index}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(personSchema).replace(/</g, "\\u003c"),
+            __html: safeJsonLd(schema as object),
           }}
         />
-      )}
+      ))}
 
       <TalentProfileClient />
     </>

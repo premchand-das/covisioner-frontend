@@ -21,6 +21,8 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
 
   const role = searchParams.get("role") as "talent" | "startup" | null;
+  const errorParam = searchParams.get("error");
+
   const { login, loading } = useAuthStore();
 
   const [form, setForm] = useState({
@@ -29,7 +31,11 @@ export default function LoginPage() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    errorParam === "role_required"
+      ? "This Google account needs a role first. Please sign up and choose Talent or Startup."
+      : ""
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -38,10 +44,46 @@ export default function LoginPage() {
     });
   };
 
+  // Login should NOT send role.
+  // Signup page should send role.
   const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google${
-      role ? `?role=${role}` : ""
-    }`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  };
+
+  const redirectUser = (user: any) => {
+    if (!user?.role) {
+      router.push("/signup");
+      return;
+    }
+
+    if (!user?.onboardingCompleted) {
+      router.push("/onboarding");
+      return;
+    }
+
+    if (user.role === "talent") {
+      router.push("/talent/explore/startups");
+      return;
+    }
+
+    if (user.role === "startup") {
+      router.push("/startup/startups");
+      return;
+    }
+
+    router.push("/");
+  };
+
+  const isUserNotFoundError = (message: string) => {
+    const lower = message.toLowerCase();
+
+    return (
+      lower.includes("user not found") ||
+      lower.includes("account not found") ||
+      lower.includes("not registered") ||
+      lower.includes("no account") ||
+      lower.includes("invalid email")
+    );
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -54,18 +96,16 @@ export default function LoginPage() {
         password: form.password,
       });
 
-      if (!user.onboardingCompleted) {
-        router.push("/onboarding");
+      redirectUser(user);
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Login failed";
+
+      if (isUserNotFoundError(message)) {
+        router.push("/signup");
         return;
       }
 
-      if (user.role === "talent") {
-        router.push("/talent/explore/startups");
-      } else {
-        router.push("/startup/startups");
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(message);
     }
   };
 
@@ -192,7 +232,7 @@ export default function LoginPage() {
               <p className="mt-8 text-center text-sm text-neutral-500">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href={`/signup${role ? `?role=${role}` : ""}`}
+                  href="/signup"
                   className="font-semibold text-neutral-950 hover:underline"
                 >
                   Sign up
@@ -203,45 +243,10 @@ export default function LoginPage() {
 
           <aside className="relative hidden overflow-hidden bg-[#F6F5F0] lg:block">
             <div className="absolute inset-y-0 left-0 w-28 bg-gradient-to-r from-white to-transparent" />
-
             <div className="absolute right-20 top-16 h-24 w-24 rounded-full bg-white blur-2xl" />
             <div className="absolute bottom-24 left-24 h-32 w-32 rounded-full bg-white blur-2xl" />
 
             <div className="absolute bottom-0 right-16 h-[560px] w-[390px] rounded-t-full bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]" />
-
-            <div className="absolute bottom-0 right-8 z-10 h-[520px] w-[430px]">
-              <div className="absolute bottom-0 left-1/2 h-[470px] w-[330px] -translate-x-1/2">
-                <div className="absolute left-1/2 top-6 h-36 w-36 -translate-x-1/2 rounded-full bg-neutral-950" />
-
-                <div className="absolute left-1/2 top-24 h-28 w-28 -translate-x-1/2 rounded-full bg-[#C78F6F]" />
-
-                <div className="absolute left-[92px] top-[70px] h-16 w-36 rounded-t-full bg-[#2A2522]" />
-
-                <div className="absolute left-[92px] top-[108px] h-4 w-4 rounded-full bg-[#D9A17F]" />
-                <div className="absolute right-[92px] top-[108px] h-4 w-4 rounded-full bg-[#D9A17F]" />
-
-                <div className="absolute left-[128px] top-[120px] h-2 w-2 rounded-full bg-neutral-950" />
-                <div className="absolute right-[128px] top-[120px] h-2 w-2 rounded-full bg-neutral-950" />
-
-                <div className="absolute left-1/2 top-[145px] h-2 w-9 -translate-x-1/2 rounded-full bg-[#884A3D]" />
-
-                <div className="absolute left-1/2 top-[190px] h-[210px] w-[190px] -translate-x-1/2 rounded-[44px] bg-white shadow-[0_25px_60px_rgba(0,0,0,0.10)]" />
-
-                <div className="absolute left-8 top-[245px] h-20 w-28 rotate-[-13deg] rounded-full bg-[#C78F6F]" />
-                <div className="absolute right-8 top-[245px] h-20 w-28 rotate-[13deg] rounded-full bg-[#C78F6F]" />
-
-                <div className="absolute left-1/2 top-[275px] h-32 w-60 -translate-x-1/2 rounded-[28px] bg-[#DAD7D1] shadow-[0_24px_50px_rgba(0,0,0,0.12)]">
-                  <div className="mx-auto mt-12 h-8 w-8 rounded-full bg-[#B9B4AB]" />
-                  <div className="absolute bottom-4 left-1/2 h-1.5 w-24 -translate-x-1/2 rounded-full bg-[#C7C2BA]" />
-                </div>
-
-                <div className="absolute left-[78px] top-[62px] h-28 w-5 rounded-full bg-white" />
-                <div className="absolute right-[78px] top-[62px] h-28 w-5 rounded-full bg-white" />
-
-                <div className="absolute bottom-0 left-8 h-32 w-28 rounded-t-[34px] bg-[#002045]" />
-                <div className="absolute bottom-0 right-8 h-32 w-28 rounded-t-[34px] bg-[#002045]" />
-              </div>
-            </div>
 
             <div className="absolute bottom-8 left-8 z-20 rounded-[28px] border border-black/[0.06] bg-white/75 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.08)] backdrop-blur-xl">
               <p className="text-sm font-semibold tracking-[-0.03em] text-neutral-950">

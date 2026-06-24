@@ -307,7 +307,6 @@ export default function ExploreJobsPage() {
         <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-10 lg:py-24">
           <div className="mx-auto max-w-6xl text-center">
             <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 shadow-sm ring-1 ring-black/[0.06]">
-              <Sparkles className="h-4 w-4" />
               Startup Roles
             </p>
 

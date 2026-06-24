@@ -21,11 +21,21 @@ async function getJob(slug: string) {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+function cleanDescription(value?: string) {
+  if (!value) return "";
+
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 155);
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const job = await getJob(slug);
+
+  const canonical = `${siteConfig.url}/jobs/${slug}`;
 
   if (!job) {
     return {
@@ -33,7 +43,7 @@ export async function generateMetadata({
       description:
         "Explore startup jobs, early-stage roles, and founder-led opportunities on CoVisioner.",
       alternates: {
-        canonical: `${siteConfig.url}/jobs/${slug}`,
+        canonical,
       },
     };
   }
@@ -41,7 +51,7 @@ export async function generateMetadata({
   const startupName = job.startup?.startupName || "Startup";
   const title = `${job.title} at ${startupName} | Startup Job`;
   const description =
-    job.description?.slice(0, 155) ||
+    cleanDescription(job.description) ||
     `Apply for ${job.title} at ${startupName}. Explore startup jobs, salary, equity, skills, and team details on CoVisioner.`;
 
   const image = job.startup?.logo || siteConfig.ogImage;
@@ -50,12 +60,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: `${siteConfig.url}/jobs/${slug}`,
+      canonical,
     },
     openGraph: {
       title,
       description,
-      url: `${siteConfig.url}/jobs/${slug}`,
+      url: canonical,
       siteName: "CoVisioner",
       images: [
         {

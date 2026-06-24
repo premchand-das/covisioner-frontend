@@ -22,11 +22,25 @@ async function getStartup(slug: string) {
   }
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+function cleanText(value?: string, max = 155) {
+  if (!value) return "";
+
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+
+function safeJsonLd(schema: object) {
+  return JSON.stringify(schema).replace(/</g, "\\u003c");
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const startup = await getStartup(slug);
+
+  const canonical = `${siteConfig.url}/startups/${slug}`;
 
   if (!startup) {
     return {
@@ -34,7 +48,7 @@ export async function generateMetadata({
       description:
         "Explore startup profiles, journeys, jobs, and teams on CoVisioner.",
       alternates: {
-        canonical: `${siteConfig.url}/startups/${slug}`,
+        canonical,
       },
     };
   }
@@ -42,9 +56,9 @@ export async function generateMetadata({
   const title = `${startup.startupName} | Startup Profile, Jobs & Journey`;
 
   const description =
-    startup.tagline ||
-    startup.vision ||
-    startup.bio?.slice(0, 155) ||
+    cleanText(startup.tagline) ||
+    cleanText(startup.vision) ||
+    cleanText(startup.bio) ||
     `Explore ${startup.startupName}'s startup profile, journey, team, technologies, and open jobs on CoVisioner.`;
 
   const image = startup.coverImage || startup.logo || siteConfig.ogImage;
@@ -53,12 +67,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: `${siteConfig.url}/startups/${slug}`,
+      canonical,
     },
     openGraph: {
       title,
       description,
-      url: `${siteConfig.url}/startups/${slug}`,
+      url: canonical,
       siteName: "CoVisioner",
       images: [
         {
@@ -83,18 +97,29 @@ export default async function StartupPage({ params }: Props) {
   const { slug } = await params;
   const startup = await getStartup(slug);
 
+  const canonical = `${siteConfig.url}/startups/${slug}`;
+
+  const sameAs = startup
+    ? [
+        startup.website,
+        startup.socialLinks?.linkedin,
+        startup.socialLinks?.twitter,
+        startup.socialLinks?.github,
+      ].filter(Boolean)
+    : [];
+
   const organizationSchema = startup
     ? {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: startup.startupName,
-        url: `${siteConfig.url}/startups/${slug}`,
+        url: canonical,
         logo: startup.logo || undefined,
         image: startup.coverImage || startup.logo || siteConfig.ogImage,
         description:
-          startup.tagline ||
-          startup.vision ||
-          startup.bio ||
+          cleanText(startup.tagline, 500) ||
+          cleanText(startup.vision, 500) ||
+          cleanText(startup.bio, 500) ||
           `${startup.startupName} startup profile on CoVisioner.`,
         foundingDate: startup.foundedYear
           ? String(startup.foundedYear)
@@ -107,26 +132,53 @@ export default async function StartupPage({ params }: Props) {
               addressCountry: "IN",
             }
           : undefined,
-        sameAs: [
-          startup.website,
-          startup.socialLinks?.linkedin,
-          startup.socialLinks?.twitter,
-          startup.socialLinks?.github,
-        ].filter(Boolean),
-        knowsAbout: startup.technologies || undefined,
+        sameAs: sameAs.length ? sameAs : undefined,
+        knowsAbout: startup.technologies?.length
+          ? startup.technologies
+          : undefined,
       }
     : null;
 
+  const breadcrumbSchema = startup
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: siteConfig.url,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Startups",
+            item: `${siteConfig.url}/startups`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: startup.startupName,
+            item: canonical,
+          },
+        ],
+      }
+    : null;
+
+  const schemas = [organizationSchema, breadcrumbSchema].filter(Boolean);
+
   return (
     <>
-      {organizationSchema && (
+      {schemas.map((schema, index) => (
         <script
+          key={index}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema).replace(/</g, "\\u003c"),
+            __html: safeJsonLd(schema as object),
           }}
         />
-      )}
+      ))}
 
       <StartupPublicClient />
     </>

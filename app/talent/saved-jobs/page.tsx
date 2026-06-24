@@ -5,7 +5,7 @@ import Link from "next/link";
 import api from "@/lib/api";
 import SharedNavbar from "@/components/SharedNavbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { Bookmark, MapPin, Briefcase, IndianRupee, Heart } from "lucide-react";
+import { Bookmark, MapPin, Briefcase, IndianRupee, SaveIcon } from "lucide-react";
 
 interface SavedJob {
   _id: string;
@@ -93,7 +93,7 @@ function SavedJobsContent() {
           </div>
         ) : savedJobs.length === 0 ? (
           <div className="rounded-[32px] border border-dashed border-black/10 bg-white p-12 text-center">
-            <Heart className="mx-auto h-12 w-12 text-neutral-300" />
+            <SaveIcon className="mx-auto h-12 w-12 text-neutral-300" />
             <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-neutral-950">
               No saved jobs yet
             </h3>

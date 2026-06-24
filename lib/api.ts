@@ -5,19 +5,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Attach localStorage accessToken as Bearer token
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("accessToken");
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  return config;
-});
-
 let isRefreshing = false;
 
 let failedQueue: {
@@ -64,8 +51,7 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url?.includes("/auth/login") &&
       !originalRequest.url?.includes("/auth/register") &&
-      !originalRequest.url?.includes("/auth/refresh") &&
-      !originalRequest.url?.includes("/auth/me")
+      !originalRequest.url?.includes("/auth/refresh")
     ) {
       originalRequest._retry = true;
 
@@ -81,11 +67,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshRes = await api.post("/auth/refresh");
-
-        if (refreshRes.data?.accessToken && typeof window !== "undefined") {
-          localStorage.setItem("accessToken", refreshRes.data.accessToken);
-        }
+        await api.post("/auth/refresh");
 
         processQueue();
 
