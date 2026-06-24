@@ -87,9 +87,9 @@ export const metadata: Metadata = {
     canonical: siteConfig.url,
   },
 
-  verification: {
-    google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
-  },
+verification: {
+  google: "abc123XYZ987...",
+},
 };
 
 export default function RootLayout({
