@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   },
 
 verification: {
-  google: "abc123XYZ987...",
+  google: "lzkuoWzi2mfECTUagCMZLTmpqGjsgTcTSN9OTRqfUNo",
 },
 };
 
