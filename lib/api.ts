@@ -24,16 +24,25 @@ const processQueue = (error: unknown = null) => {
 const isPublicPage = () => {
   if (typeof window === "undefined") return false;
 
+  const pathname = window.location.pathname;
+
   const publicPaths = [
+    "/",
     "/login",
     "/signup",
     "/verify-email",
     "/forgot-password",
-    "/reset-password",
+    "/talent/explore",
+    "/talent/explore/jobs",
+    "/talent/explore/startups",
   ];
 
-  return publicPaths.some((path) =>
-    window.location.pathname.startsWith(path)
+  return (
+    publicPaths.includes(pathname) ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/startups") ||
+    pathname.startsWith("/jobs") ||
+    pathname.startsWith("/t/")
   );
 };
 
