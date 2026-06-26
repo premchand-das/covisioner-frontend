@@ -9,7 +9,7 @@ type Props = {
 async function getTalentProfile(username: string) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/profile/username/${username}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/talent/username/${username}`,
       { cache: "no-store" }
     );
 
