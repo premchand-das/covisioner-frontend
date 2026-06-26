@@ -82,11 +82,6 @@ function MyApplicationsContent() {
         <section className="rounded-[34px] border border-black/[0.06] bg-white p-6 shadow-[0_30px_100px_rgba(0,0,0,0.07)] sm:p-8">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full bg-[#F6F5F0] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                <Send className="h-4 w-4" />
-                Application Tracker
-              </p>
-
               <h1 className="mt-6 max-w-3xl text-5xl font-semibold tracking-[-0.07em] sm:text-7xl">
                 Track every startup application.
               </h1>

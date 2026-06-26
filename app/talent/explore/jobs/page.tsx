@@ -39,10 +39,11 @@ interface Job {
   employmentType: string;
   experienceLevel: string;
   location: string;
-  salaryRange?: {
-    min?: number;
-    max?: number;
-  };
+ salaryRange?: {
+  min?: number;
+  max?: number;
+  type?: "monthly" | "yearly";
+};
   equityRange?: {
     min?: number;
     max?: number;
@@ -700,6 +701,11 @@ function JobCard({ job }: { job: Job }) {
     }
   };
 
+  function formatSalaryType(type?: string) {
+  if (type === "yearly") return "/ year";
+  return "/ month";
+}
+
   return (
     <article className="group relative overflow-hidden rounded-[30px] border border-black/[0.06] bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.08)]">
       <div className="pointer-events-none absolute right-[-70px] top-[-90px] h-44 w-44 rounded-full bg-[#F6F5F0] blur-2xl transition group-hover:bg-[#ECE7DC]" />
@@ -772,9 +778,10 @@ function JobCard({ job }: { job: Job }) {
 
         <div className="flex items-center gap-2 text-sm font-semibold text-neutral-600">
           <IndianRupee className="h-4 w-4 text-neutral-400" />
-          <span>
-            ₹{job.salaryRange?.min || 0} - ₹{job.salaryRange?.max || 0}
-          </span>
+<span>
+  ₹{job.salaryRange?.min || 0} - ₹{job.salaryRange?.max || 0}{" "}
+  {formatSalaryType(job.salaryRange?.type)}
+</span>
         </div>
       </div>
 

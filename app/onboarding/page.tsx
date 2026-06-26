@@ -479,8 +479,11 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F6F5F0] px-4 py-5 text-neutral-950 md:px-8 md:py-8">
-      <div className="mx-auto max-w-7xl">
+    <main
+      translate="no"
+      className="notranslate min-h-screen overflow-x-hidden bg-[#F6F5F0] px-4 py-5 text-neutral-950 md:px-8 md:py-8"
+    >
+      <div className="mx-auto max-w-7xl min-w-0">
         <nav className="mb-6 flex items-center justify-between rounded-[26px] border border-black/[0.06] bg-white px-5 py-4 shadow-[0_12px_40px_rgba(0,0,0,0.04)]">
           <div>
             <p className="text-lg font-semibold tracking-[-0.04em] text-neutral-950">
@@ -496,7 +499,7 @@ export default function OnboardingPage() {
           </div>
         </nav>
 
-        <section className="grid gap-6 lg:grid-cols-[0.86fr_1.44fr]">
+        <section className="grid min-w-0 gap-6 lg:grid-cols-[0.86fr_1.44fr]">
           <aside className="rounded-[32px] border border-black/[0.06] bg-white p-6 shadow-[0_24px_80px_rgba(0,0,0,0.05)] md:p-8 lg:sticky lg:top-8 lg:h-fit">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-[#F6F5F0] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
@@ -578,7 +581,7 @@ export default function OnboardingPage() {
             </div>
           </aside>
 
-          <section className="rounded-[32px] border border-black/[0.06] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.05)] md:p-8">
+          <section className="min-w-0 rounded-[32px] border border-black/[0.06] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.05)] md:p-8">
             <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">
@@ -605,7 +608,7 @@ export default function OnboardingPage() {
             )}
 
             {isTalent ? (
-              <form onSubmit={submitTalent} className="space-y-8">
+              <form translate="no" onSubmit={submitTalent} className="notranslate space-y-8">
                 <FormSection
                   title="Basic profile"
                   description="Use a clear name and headline so founders instantly understand your role."
@@ -736,7 +739,7 @@ export default function OnboardingPage() {
                 />
               </form>
             ) : (
-              <form onSubmit={submitStartup} className="space-y-8">
+              <form translate="no" onSubmit={submitStartup} className="notranslate space-y-8">
                 <FormSection
                   title="Company identity"
                   description="Use real startup details. This becomes your public startup profile."
@@ -1005,8 +1008,11 @@ function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[26px] border border-black/[0.06] bg-white p-5">
-      <div className="mb-5">
+    <section
+      translate="no"
+      className="notranslate relative isolate min-w-0 rounded-[26px] border border-black/[0.06] bg-white p-5"
+    >
+      <div className="mb-5 min-w-0">
         <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-neutral-400">
           {title}
         </h3>
@@ -1016,7 +1022,7 @@ function FormSection({
           </p>
         )}
       </div>
-      {children}
+      <div className="min-w-0">{children}</div>
     </section>
   );
 }
@@ -1030,9 +1036,9 @@ function Input({
   icon?: React.ReactNode;
 }) {
   return (
-    <div>
+    <div translate="no" className="notranslate min-w-0">
       <label className="text-sm font-semibold text-neutral-800">{label}</label>
-      <div className="relative mt-2">
+      <div className="relative mt-2 min-w-0">
         {icon && (
           <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400">
             {icon}
@@ -1040,8 +1046,11 @@ function Input({
         )}
         <input
           {...props}
+          translate="no"
+          autoCorrect="off"
+          spellCheck={false}
           className={[
-            "w-full rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 py-3.5 text-sm font-medium text-neutral-950 outline-none transition placeholder:text-neutral-400",
+            "notranslate w-full min-w-0 rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 py-3.5 text-sm font-medium text-neutral-950 outline-none transition placeholder:text-neutral-400",
             "focus:bg-white focus:ring-4 focus:ring-neutral-950/10",
             icon ? "pl-11" : "",
           ].join(" ")}
@@ -1056,12 +1065,15 @@ function Textarea({
   ...props
 }: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }) {
   return (
-    <div>
+    <div translate="no" className="notranslate min-w-0">
       <label className="text-sm font-semibold text-neutral-800">{label}</label>
       <textarea
         {...props}
+        translate="no"
+        autoCorrect="off"
+        spellCheck={false}
         rows={6}
-        className="mt-2 w-full resize-none rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 py-3.5 text-sm font-medium text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:bg-white focus:ring-4 focus:ring-neutral-950/10"
+        className="notranslate mt-2 w-full min-w-0 resize-none rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 py-3.5 text-sm font-medium text-neutral-950 outline-none transition placeholder:text-neutral-400 focus:bg-white focus:ring-4 focus:ring-neutral-950/10"
       />
     </div>
   );
@@ -1081,14 +1093,15 @@ function Select({
   options: string[];
 }) {
   return (
-    <div>
+    <div translate="no" className="notranslate min-w-0">
       <label className="text-sm font-semibold text-neutral-800">{label}</label>
-      <div className="relative mt-2">
+      <div className="relative mt-2 min-w-0">
         <select
           name={name}
           value={value}
           onChange={onChange}
-          className="h-[50px] w-full appearance-none rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 text-sm font-medium text-neutral-950 outline-none transition focus:bg-white focus:ring-4 focus:ring-neutral-950/10"
+          translate="no"
+          className="notranslate h-[50px] w-full min-w-0 appearance-none rounded-2xl border border-black/[0.06] bg-[#F6F5F0] px-4 text-sm font-medium text-neutral-950 outline-none transition focus:bg-white focus:ring-4 focus:ring-neutral-950/10"
         >
           {options.map((item) => (
             <option key={item} value={item}>
@@ -1116,15 +1129,16 @@ function SkillCloud({
   const selectedItems = toList(selected);
 
   return (
-    <div className="mt-4">
+    <div translate="no" className="notranslate mt-4 min-w-0 overflow-hidden">
       {selectedItems.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-4 flex min-w-0 flex-wrap items-start gap-2">
           {selectedItems.map((item) => (
             <button
-              key={item}
+              key={`selected-${item}`}
               type="button"
+              translate="no"
               onClick={() => onRemove(item)}
-              className="inline-flex items-center gap-2 rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
+              className="notranslate inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-white"
             >
               {item}
               <X className="h-3.5 w-3.5" />
@@ -1133,17 +1147,18 @@ function SkillCloud({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex min-w-0 flex-wrap items-start gap-2">
         {suggestions.map((item) => {
           const active = selectedItems.includes(item);
 
           return (
             <button
-              key={item}
+              key={`suggestion-${item}`}
               type="button"
+              translate="no"
               onClick={() => (active ? onRemove(item) : onAdd(item))}
               className={[
-                "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                "notranslate inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition",
                 active
                   ? "border-neutral-950 bg-neutral-950 text-white"
                   : "border-black/[0.06] bg-[#F6F5F0] text-neutral-600 hover:border-neutral-300",

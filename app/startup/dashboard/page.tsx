@@ -20,6 +20,7 @@ interface Job {
   salaryRange?: {
     min?: number;
     max?: number;
+    period?: "monthly" | "yearly";
   };
   equityRange?: {
     min?: number;
@@ -63,6 +64,7 @@ function StartupDashboardContent() {
     skillsRequired: "",
     salaryMin: "",
     salaryMax: "",
+    salaryPeriod: "monthly",
     equityMin: "",
     equityMax: "",
   });
@@ -113,6 +115,7 @@ function StartupDashboardContent() {
         salaryRange: {
           min: form.salaryMin ? Number(form.salaryMin) : 0,
           max: form.salaryMax ? Number(form.salaryMax) : 0,
+          period: form.salaryPeriod,
         },
 
         equityRange: {
@@ -131,6 +134,7 @@ function StartupDashboardContent() {
         skillsRequired: "",
         salaryMin: "",
         salaryMax: "",
+        salaryPeriod: "monthly",
         equityMin: "",
         equityMax: "",
       });
@@ -264,7 +268,7 @@ function StartupDashboardContent() {
                     Compensation
                   </p>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-3">
                     <Input
                       label="Min salary"
                       name="salaryMin"
@@ -284,6 +288,14 @@ function StartupDashboardContent() {
                       onChange={handleChange}
                       placeholder="50000"
                     />
+
+                    <Select
+                      label="Salary type"
+                      name="salaryPeriod"
+                      value={form.salaryPeriod}
+                      onChange={handleChange}
+                      options={["monthly", "yearly"]}
+                    />
                   </div>
 
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -292,10 +304,11 @@ function StartupDashboardContent() {
                       name="equityMin"
                       type="number"
                       min={0}
-                      step="0.1"
+                      step="0.01"
+                      inputMode="decimal"
                       value={form.equityMin}
                       onChange={handleChange}
-                      placeholder="4"
+                      placeholder="0.01"
                     />
 
                     <Input
@@ -303,10 +316,11 @@ function StartupDashboardContent() {
                       name="equityMax"
                       type="number"
                       min={0}
-                      step="0.1"
+                      step="0.01"
+                      inputMode="decimal"
                       value={form.equityMax}
                       onChange={handleChange}
-                      placeholder="2"
+                      placeholder="1.00"
                     />
                   </div>
                 </div>
@@ -322,9 +336,6 @@ function StartupDashboardContent() {
 
             <section className="h-fit">
               <div className="mb-5 rounded-[34px] border border-black/[0.06] bg-white p-6 shadow-[0_18px_60px_rgba(0,0,0,0.04)]">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400">
-                  Pipeline
-                </p>
 
                 <h2 className="mt-2 text-4xl font-semibold tracking-[-0.06em]">
                   My Jobs
@@ -373,6 +384,9 @@ function StartupDashboardContent() {
                           <span className="rounded-full bg-[#F6F5F0] px-3 py-1.5 text-xs font-semibold text-neutral-800">
                             ₹{job.salaryRange?.min || 0} - ₹
                             {job.salaryRange?.max || 0}
+                            {job.salaryRange?.period
+                              ? ` / ${job.salaryRange.period === "yearly" ? "year" : "month"}`
+                              : ""}
                           </span>
                         ) : null}
 
